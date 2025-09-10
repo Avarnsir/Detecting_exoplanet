@@ -1,13 +1,14 @@
 import numpy as np 
 import matplotlib.pyplot as plt 
 import pandas as pd 
-import scipy import signal, stats
-import scipy.optimize import minimize 
+from scipy import signal, stats
+from scipy.optimize import minimize 
 import warnings
 warnings.filterwarnings('ignore')
 import astropy.units as u
 from astropy.timeseries import BoxLeastSquares
-from astropy import constants as constimport lightkurve as lk
+from astropy import constants as const
+import lightkurve as lk
 
 constants = {
     'R_earth' : 6.71e6,
@@ -18,29 +19,18 @@ constants = {
     'ppm' : 1e-6
 }
 
-class exoplanet_detection:
-    """
-    TESS exoplanet detection pipeline
+search_result = lk.search_lightcurve('TOI 715', mission='TESS')
+lc_collection = search_result.download_all()
 
-    This class handles:
-    1.TESS data download and preprocessing
-    2.Transit search algorithm (BLS)
-    3. Signal validation and chracterization
-    4. Planet parameter estimation
-    """
-    def __init__(self, target_name=None, tic_id=None):
-        self.target_name = TOI 715
-        #self.tic_id = TIC 
-        self.lightcurve = detetector.download_tress_data(sectors='all')
-        self.processed_lc = 
-        self.transit_results = []
-        self.planet_candidates = []
+lc = lc_collection.stitch().remove_nans().flatten(window_length=401)
 
-        print(f"Initialized TESS exoplanet detector")
-        if target_name:
-            print(f"Target: {target_name}")
-        if tic_id:
-            print(f"TIC ID: {tic_id}")
+lc.plot(title="TOI-715 TESS Light Curve")
 
-    def download_tess_data(self, sectors='all', cadence='short'):
+periods = np.linespace(1, 20, 10000)
+bls = lc.to_peridogram(method ='bls', period=periods)
 
+bls.plot(title="Box Least Squares Periodogram")
+period = bls.period_at_max_power
+t0 = bls.transit_time_at_max_power
+
+folded_lc = lc.fold(period=periods, )
